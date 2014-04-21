@@ -1,12 +1,10 @@
-// Compile with `gcc -std=c99 -pedantic`.
+// Compiled with: clang -std=c99 -Weverything
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
-
-const char * const id3v1_header = "TAG";
 
 struct id3v1_1
 {
@@ -26,7 +24,7 @@ static char check_header(char *header)
 	return (header[0]=='T' && header[1]=='A' && header[2]=='G');
 }
 
-void print_non_null_terminated_str(const char *s, int len)
+static void print_non_null_terminated_str(const char *s, int len)
 {
 	for(int i = 0; *s && i < len; i++)
 		printf("%c", *s++);
@@ -62,7 +60,7 @@ static void display_tag(const struct id3v1_1 *tag)
 	puts("----------------------------------------");
 }
 
-void copy_str_field(char * const src, char *dst, const int len)
+static void copy_str_field(char * const src, char *dst, const int len)
 {
 	char *sp = src;
 	int i = 0;
@@ -79,7 +77,7 @@ void copy_str_field(char * const src, char *dst, const int len)
 		dst[i++] = '\0'; // zero out the rest/all of *dst
 }
 
-static char parse_cmdl_args(int argc, char *argv[], struct id3v1_1 *tag, char upd_msgs)
+static char parse_cmdl_args(int argc, char *argv[], struct id3v1_1 *tag)
 {
 	char modify = 0;
 	for(int c; (c = getopt (argc, argv, "t:a:A:y:c:n:g:")) != -1; modify=1)
@@ -140,7 +138,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	fseek(f, - sizeof(struct id3v1_1), SEEK_END);
+	fseek(f, -1 * (long int) sizeof(struct id3v1_1), SEEK_END);
 	fread(&file_tag, sizeof(struct id3v1_1), 1, f);
 
 	if(check_header(file_tag.header)) {
@@ -148,7 +146,7 @@ int main(int argc, char *argv[])
 
 		display_tag(&file_tag);
 
-		char result = parse_cmdl_args(argc, argv, &file_tag, 1);
+		char result = parse_cmdl_args(argc, argv, &file_tag);
 
 		if(result == -1) {
 			fprintf(stderr, "Exiting due to malformed arguments...\n");
@@ -158,7 +156,7 @@ int main(int argc, char *argv[])
 		if(result == 1) {
 			puts("Updating ID3v1 tag to the following:");
 			display_tag(&file_tag);
-			fseek(f, - sizeof(struct id3v1_1), SEEK_END);
+			fseek(f, -1 * (long int) sizeof(struct id3v1_1), SEEK_END);
 			fwrite(&file_tag, sizeof(struct id3v1_1), 1, f);
 		}
 	}
@@ -167,7 +165,7 @@ int main(int argc, char *argv[])
 
 		struct id3v1_1 new_tag = { .header = {'T','A','G'}, .guard = '\0', .genre = 12 };
 
-		char result = parse_cmdl_args(argc, argv, &new_tag, 0);
+		char result = parse_cmdl_args(argc, argv, &new_tag);
 
 		if(result == -1) {
 			fprintf(stderr, "Exiting due to malformed arguments...\n");
