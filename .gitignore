@@ -15,6 +15,7 @@
 *.dylib
 
 # Executables
+ID3v1Tag
 *.exe
 *.out
 *.app
