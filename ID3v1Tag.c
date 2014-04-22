@@ -1,4 +1,4 @@
-// Compiled with: clang -std=c99 -Weverything
+// Compile with: clang -std=c99 -Weverything ID3v1Tag.c -o ID3v1Tag
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,9 +60,9 @@ static void display_tag(const struct id3v1_1 *tag)
 	puts("----------------------------------------");
 }
 
-static void copy_str_field(char * const src, char *dst, const int len)
+static void copy_str_field(const char * const src, char *dst, const int len)
 {
-	char *sp = src;
+	const char *sp = src;
 	int i = 0;
 
 	if(sp != NULL) {
@@ -70,7 +70,7 @@ static void copy_str_field(char * const src, char *dst, const int len)
 			dst[i++] = *sp++;
 
 		if(*sp != '\0' && i == len)
-			fprintf(stderr, "The following string has been truncated to %d characters: %s\n", len, src);
+			printf("Field truncated to %d characters: %s\n", len, src);
 	}
 
 	while(i < len)
