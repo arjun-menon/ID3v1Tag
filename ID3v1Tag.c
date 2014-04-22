@@ -124,11 +124,12 @@ static char parse_cmdl_args(int argc, char *argv[], struct id3v1_1 *tag)
 int main(int argc, char *argv[])
 {
 	if(argc < 2) {
-		fprintf(stderr, "Please specify a file name (as the last argument).\n");
+		fprintf(stderr, "Please specify a file name as the first argument.\n");
 		return EXIT_FAILURE;
 	}
 
-	char *filename = argv[--argc];
+	char *filename = argv[1];
+	optind ++; // Skip file name (for later optarg processing)
 
 	struct id3v1_1 file_tag = { .header = "\0\0\0", .guard = '\0', .genre = 12 };
 
