@@ -6,6 +6,27 @@
 #include <ctype.h>
 #include <unistd.h>
 
+static const char * const usage = 
+"usage: %s FILE_NAME [-h] [-t TITLE] [-a ARTIST] [-A ALBUM] [-y YEAR]\n\
+                     [-c COMMENT] [-n TRACK] [-g GENRE]\n\
+\n\
+Add, view, and update ID3v1.1 tags in MP3 files.\n\
+\n\
+positional arguments:\n\
+  FILE_NAME            the file to process\n\
+\n\
+optional arguments:\n\
+  -h            show this help message and exit\n\
+  -t TITLE      ID3v1 title (maximum length 30)\n\
+  -a ARTIST     ID3v1 artist name (maximum length 30)\n\
+  -A ALBUM      ID3v1 album name (maximum length 30)\n\
+  -y YEAR       ID3v1 year of release (4 characters)\n\
+  -c COMMENT    ID3v1 optional comment (maximum 28 characters)\n\
+  -n TRACK      ID3v1 optional track number (0-255)\n\
+  -g GENRE      ID3v1 see https://en.wikipedia.org/wiki/ID3#List_of_Genres\n\
+";
+static const char *executable_name = NULL;
+
 struct id3v1_1
 {
 	char header[3]; // "TAG"
@@ -67,6 +88,9 @@ static char parse_cmdl_args(int argc, char *argv[], struct id3v1_1 *tag)
 	for(int c; (c = getopt (argc, argv, "t:a:A:y:c:n:g:")) != -1; modify=1)
 	{
 		switch (c) {
+		case 'h':
+			printf(usage, executable_name);
+			return -1;
 		case 't':
 			copy_str_field(optarg, tag->title, 30);
 			break;
@@ -107,9 +131,16 @@ static char parse_cmdl_args(int argc, char *argv[], struct id3v1_1 *tag)
 
 int main(int argc, char *argv[])
 {
+	executable_name = argv[0];
+
 	if(argc < 2) {
 		fprintf(stderr, "Please specify a file name as the first argument.\n");
 		return EXIT_FAILURE;
+	}
+
+	if(!strcmp("-h", argv[1])) {
+		printf(usage, executable_name);
+		return EXIT_SUCCESS;
 	}
 
 	char *filename = argv[1];
@@ -153,7 +184,8 @@ int main(int argc, char *argv[])
 		char result = parse_cmdl_args(argc, argv, &new_tag);
 
 		if(result == -1) {
-			fprintf(stderr, "Exiting due to malformed arguments...\n");
+			fprintf(stderr, "Exiting due to incorrect arguments. See usage below: \n");
+			printf(usage, executable_name);
 			return EXIT_FAILURE;
 		}
 
