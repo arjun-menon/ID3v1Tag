@@ -28,35 +28,19 @@ static void print_non_null_terminated_str(const char *s, int len)
 {
 	for(int i = 0; *s && i < len; i++)
 		printf("%c", *s++);
+	puts("");
 }
 
 static void display_tag(const struct id3v1_1 *tag)
 {
 	puts("----------------------------------------");
-
-	printf("Title: ");
-	print_non_null_terminated_str(tag->title, 30);
-	puts("");
-
-	printf("Artist: ");
-	print_non_null_terminated_str(tag->artist, 30);
-	puts("");
-
-	printf("Album: ");
-	print_non_null_terminated_str(tag->album, 30);
-	puts("");
-
-	printf("Year: ");
-	print_non_null_terminated_str(tag->year, 4);
-	puts("");
-
-	printf("Comment: ");
-	print_non_null_terminated_str(tag->comment, 28);
-	puts("");
-
+	printf("Title: "); print_non_null_terminated_str(tag->title, 30);
+	printf("Artist: "); print_non_null_terminated_str(tag->artist, 30);
+	printf("Album: "); print_non_null_terminated_str(tag->album, 30);
+	printf("Year: "); print_non_null_terminated_str(tag->year, 4);
+	printf("Comment: "); print_non_null_terminated_str(tag->comment, 28);
 	printf("Genre: %d\n", tag->genre);
 	printf("Track: %d\n", tag->track);
-
 	puts("----------------------------------------");
 }
 
